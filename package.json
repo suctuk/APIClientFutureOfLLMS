@@ -1,0 +1,16 @@
+{
+    "name": "express-server-example",
+    "version": "1.0.0",
+    "description": "A simple Node.js server with Express for Render deployment",
+    "main": "server.js",
+    "scripts": {
+      "start": "node server.js"
+    },
+    "keywords": ["nodejs", "express", "render", "example"],
+    "author": "Your Name",
+    "license": "MIT",
+    "dependencies": {
+      "express": "^4.18.2"
+    }
+  }
+  
