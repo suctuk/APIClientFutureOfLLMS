@@ -97,13 +97,13 @@ bool RadioClient::getLatestMessage(const std::string& username) {
     
     if (res == CURLE_OK) {
         if (!receivedData.empty()) {
-            // Simple JSON parsing - look for "message" field
-            size_t msgStart = receivedData.find("\"message\":\"");
+            size_t msgStart = receivedData.find(":\"");
             if (msgStart != std::string::npos) {
-                msgStart += 10; // Length of "message":"
-                size_t msgEnd = receivedData.find("\"", msgStart);
+                msgStart += 2; // now message start is the index of the first character of the actual message
+                std::string truncated = receivedData.substr(msgStart);
+                size_t msgEnd = truncated.find("\"");
                 if (msgEnd != std::string::npos) {
-                    std::string message = receivedData.substr(msgStart, msgEnd - msgStart);
+                    std::string message = truncated.substr(0, msgEnd);
                     if (!message.empty()) {
                         std::cout << "Latest message for " << username << ": " << message << std::endl;
                     }
