@@ -60,6 +60,7 @@ app.post("/send_message", (req, res) => {
 });
 
 app.get("/latest_message", (req, res) => {
+    console.log(messages);
     try {
         const username = req.query.username;
         if (!username) {

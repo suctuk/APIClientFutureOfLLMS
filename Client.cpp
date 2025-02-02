@@ -36,17 +36,34 @@ bool RadioClient::createUser(const std::string& username) {
     // Set POST method
     curl_easy_setopt(curl, CURLOPT_POST, 1L);
     
+    // Set callback for response
+    receivedData.clear();
+    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
+    curl_easy_setopt(curl, CURLOPT_WRITEDATA, &receivedData);
+    
     // Set headers
     struct curl_slist* headers = NULL;
     headers = curl_slist_append(headers, "Content-Type: application/x-www-form-urlencoded");
     curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
+    
+    // Print request details for debugging
+    std::cout << "Sending request to: " << endpoint << std::endl;
+    std::cout << "POST data: " << postData << std::endl;
     
     // Perform request
     CURLcode res = curl_easy_perform(curl);
     
     curl_slist_free_all(headers);
     
-    return (res == CURLE_OK);
+    if (res != CURLE_OK) {
+        std::cerr << "curl_easy_perform() failed: " << curl_easy_strerror(res) << std::endl;
+        return false;
+    }
+    
+    // Print response for debugging
+    std::cout << "Server response: " << receivedData << std::endl;
+    
+    return true;
 }
 
 bool RadioClient::sendMessage(const std::string& toUser, const std::string& message) {
@@ -99,13 +116,28 @@ bool RadioClient::getLatestMessage(const std::string& username) {
         if (!receivedData.empty()) {
             size_t msgStart = receivedData.find(":\"");
             if (msgStart != std::string::npos) {
-                msgStart += 2; // now message start is the index of the first character of the actual message
+                msgStart += 2;
                 std::string truncated = receivedData.substr(msgStart);
                 size_t msgEnd = truncated.find("\"");
                 if (msgEnd != std::string::npos) {
                     std::string message = truncated.substr(0, msgEnd);
                     if (!message.empty()) {
                         std::cout << "Latest message for " << username << ": " << message << std::endl;
+                        
+                        // Create and print the TTS command for debugging
+                        std::string command;
+                        #ifdef __APPLE__
+                            // Using default voice, just controlling the speed
+                            command = "/usr/bin/say -r 200 \"" + message + "\"";
+                        #elif defined(_WIN32)
+                            command = TTS_COMMAND + message + "')\""
+                        #else
+                            command = TTS_COMMAND " \"" + message + "\"";
+                        #endif
+                        
+                        std::cout << "Executing TTS command: " << command << std::endl;
+                        int result = system(command.c_str());
+                        std::cout << "TTS command result: " << result << std::endl;
                     }
                 }
             }
@@ -114,4 +146,4 @@ bool RadioClient::getLatestMessage(const std::string& username) {
     }
     
     return false;
-} 
+}

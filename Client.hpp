@@ -2,6 +2,14 @@
 #include <string>
 #include <curl/curl.h>
 
+#ifdef __APPLE__
+    #define TTS_COMMAND "say"
+#elif defined(_WIN32)
+    #define TTS_COMMAND "powershell -Command \"Add-Type –AssemblyName System.Speech; (New-Object System.Speech.Synthesis.SpeechSynthesizer).Speak('"
+#else
+    #define TTS_COMMAND "espeak"
+#endif
+
 class RadioClient {
 public:
     RadioClient(const std::string& serverUrl);
