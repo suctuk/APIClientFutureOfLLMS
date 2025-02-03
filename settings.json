@@ -1,0 +1,6 @@
+{
+    "auto_check_interval": 5,
+    "message_history_file": "message_history.txt",
+    "save_messages": true,
+    "voice_rate": 200
+}

@@ -22,29 +22,38 @@ int main() {
             std::cout << "\nOptions:\n";
             std::cout << "1. Send message\n";
             std::cout << "2. Check messages\n";
-            std::cout << "3. Quit\n";
-            std::cout << "Choose an option (1-3): ";
+            std::cout << "3. Toggle auto-check messages\n";
+            std::cout << "4. Change settings\n";
+            std::cout << "5. Quit\n";
+            std::cout << "Choose an option (1-5): ";
             
             std::string choice;
             std::getline(std::cin, choice);
             
             if (choice == "1") {
                 std::string recipient, message;
-                std::cout << "Enter recipient username: ";
+                std::cout << "Enter recipient username (or 'all' to broadcast): ";
                 std::getline(std::cin, recipient);
                 std::cout << "Enter message: ";
                 std::getline(std::cin, message);
-                
-                if (client.sendMessage(recipient, message)) {
-                    std::cout << "Message sent successfully!" << std::endl;
-                } else {
-                    std::cout << "Failed to send message." << std::endl;
-                }
+                client.sendMessage(recipient, message);
             }
             else if (choice == "2") {
                 client.getLatestMessage(username);
             }
             else if (choice == "3") {
+                static bool autoCheckEnabled = false;
+                if (autoCheckEnabled) {
+                    client.stopAutoCheck();
+                } else {
+                    client.startAutoCheck(username);
+                }
+                autoCheckEnabled = !autoCheckEnabled;
+            }
+            else if (choice == "4") {
+                client.changeSettings();
+            }
+            else if (choice == "5") {
                 break;
             }
             else {

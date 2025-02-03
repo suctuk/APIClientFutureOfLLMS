@@ -1,6 +1,14 @@
 const express = require('express');
 const app = express();
 
+// Add CORS headers
+app.use((req, res, next) => {
+    res.header('Access-Control-Allow-Origin', '*');
+    res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+    res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+    next();
+});
+
 // Add body parser middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -46,6 +54,17 @@ app.post("/send_message", (req, res) => {
             return res.status(400).json({ error: 'Recipient and message are required' });
         }
         
+        if (sendto.toLowerCase() === 'all') {
+            // Broadcast to all users
+            for (let user in messages) {
+                messages[user] = message;
+            }
+            console.log('Broadcasting message to all users:', message);
+            res.status(200).json({ message: 'Message broadcast successfully' });
+            return;  // Important: return here to avoid the next check
+        }
+        
+        // Send to specific user
         if (!(sendto in messages)) {
             return res.status(404).json({ error: 'Recipient not found' });
         }
@@ -76,6 +95,17 @@ app.get("/latest_message", (req, res) => {
     } catch (error) {
         console.error('Error retrieving message:', error);
         res.status(500).json({ error: 'Failed to retrieve message' });
+    }
+});
+
+// Add this endpoint to get all users
+app.get("/users", (req, res) => {
+    try {
+        const userList = Object.keys(messages);
+        res.status(200).json({ users: userList });
+    } catch (error) {
+        console.error('Error getting users:', error);
+        res.status(500).json({ error: 'Failed to get users' });
     }
 });
 
