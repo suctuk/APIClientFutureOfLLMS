@@ -4,8 +4,8 @@
 
 int main() {
     try {
-        // RadioClient client("https://apiclientfutureofllms.onrender.com");
-        RadioClient client("http://localhost:3000"); 
+        RadioClient client("https://apiclientfutureofllms.onrender.com");
+        // RadioClient client("http://localhost:3000"); 
         // First, create a user
         std::string username;
         std::cout << "Enter your username: ";
